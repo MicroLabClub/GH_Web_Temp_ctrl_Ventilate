@@ -17,8 +17,6 @@ import MDButton from "components/MDButton";
 import mqtt from "mqtt";
 import {host, options} from "../../config/mqtt.config";
 import MDTypography from "components/MDTypography";
-import {defined} from "chart.js/helpers";
-
 const controlTemperatura = () => {
 
     const [messages, setMessages] = useState({});
@@ -36,17 +34,18 @@ const controlTemperatura = () => {
             console.log(result.length);
 
             let shortResult = result.splice(result.length - 50, result.length);
+
             setMessages({
                 labels: shortResult.map(x=> x.message_id),
                 datasets:
                     {
                         label: "cur_temp",
-                        data: shortResult.map(x => JSON.parse(x.message).cur_temp),
+                        data: shortResult.map(x => JSON.parse(x.message).cur_temp)
                     }
             });
 
             const resp = shortResult.map(x=> JSON.parse(x.message).cur_temp);
-            setCount(resp[49] + "°C");
+            setCount(resp[49] + " °C");
         } catch (error) {
             console.error(error);
         }
@@ -65,8 +64,8 @@ const controlTemperatura = () => {
 
     /*   Set Data */
     //const [settings, setSettings] = useState(null);
-    const [settingsTempTime, setSettingsTempTime] = useState(60);
-    const [setPoint, setPointSettings] = useState(20);
+    const [settingsTempTime, setSettingsTempTime] = useState(0);
+    const [setPoint, setPointSettings] = useState(0);
 
     function setMqttData() {
         try {
@@ -138,11 +137,11 @@ const controlTemperatura = () => {
                 value: "1",
             };
 
-            const topic = "microlab/agro/green_house/temp_vent_ctrl";
+            //const topic = "microlab/agro/green_house/temp_vent_ctrl";
 
             if (client) {
 
-                client.publish(topic, JSON.stringify(payload), (err) => {
+                client.publish(tempTopic, JSON.stringify(payload), (err) => {
                     if (err) {
                         console.error("Failed to publish message:", err);
                     } else {
@@ -166,11 +165,11 @@ const controlTemperatura = () => {
                 value: "0",
             };
 
-            const topic = "microlab/agro/green_house/temp_vent_ctrl";
+            //const topic = "microlab/agro/green_house/temp_vent_ctrl";
 
             if (client) {
 
-                client.publish(topic, JSON.stringify(payload), (err) => {
+                client.publish(tempTopic, JSON.stringify(payload), (err) => {
                     if (err) {
                         console.error("Failed to publish message:", err);
                     } else {
@@ -193,11 +192,11 @@ const controlTemperatura = () => {
                 value: String(parseFloat(setPoint)),
             };
 
-            const topic = "microlab/agro/green_house/temp_vent_ctrl";
+            //const topic = "microlab/agro/green_house/temp_vent_ctrl";
 
             if (client) {
 
-                client.publish(topic, JSON.stringify(payload), (err) => {
+                client.publish(tempTopic, JSON.stringify(payload), (err) => {
                     if (err) {
                         console.error("Failed to publish message:", err);
                     } else {
@@ -220,11 +219,11 @@ const controlTemperatura = () => {
                 value: "2",
             };
 
-            const topic = "microlab/agro/green_house/temp_vent_ctrl";
+            //const topic = "microlab/agro/green_house/temp_vent_ctrl";
 
             if (client) {
 
-                client.publish(topic, JSON.stringify(payload), (err) => {
+                client.publish(tempTopic, JSON.stringify(payload), (err) => {
                     if (err) {
                         console.error("Failed to publish message:", err);
                     } else {
@@ -248,11 +247,11 @@ const controlTemperatura = () => {
                 value: "1",
             };
 
-            const topic = "microlab/agro/green_house/temp_vent_ctrl";
+            //const topic = "microlab/agro/green_house/temp_vent_ctrl";
 
             if (client) {
 
-                client.publish(topic, JSON.stringify(payload), (err) => {
+                client.publish(tempTopic, JSON.stringify(payload), (err) => {
                     if (err) {
                         console.error("Failed to publish message:", err);
                     } else {
@@ -276,11 +275,11 @@ const controlTemperatura = () => {
                 value: "0",
             };
 
-            const topic = "microlab/agro/green_house/temp_vent_ctrl";
+            //const topic = "microlab/agro/green_house/temp_vent_ctrl";
 
             if (client) {
 
-                client.publish(topic, JSON.stringify(payload), (err) => {
+                client.publish(tempTopic, JSON.stringify(payload), (err) => {
                     if (err) {
                         console.error("Failed to publish message:", err);
                     } else {
@@ -313,7 +312,7 @@ const controlTemperatura = () => {
                             <ComplexStatisticsCard
                                 icon="thermostat"
                                 title="Temperature"
-                                count={cur_temp}
+                                count={count}
                                 percentage={{
                                     color: "success",
                                     amount: "+1",
@@ -421,4 +420,5 @@ const controlTemperatura = () => {
 };
 
 export default controlTemperatura;
+
 
