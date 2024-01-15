@@ -165,7 +165,7 @@ const routes = [
     icon: <Icon fontSize="small">settings</Icon>,
     route: "/ControlTemperatura",
     component: <ControlTemperatura />,
-  },
+  }
 
   // {
   //   type: "examples",

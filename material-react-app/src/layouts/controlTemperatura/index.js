@@ -17,35 +17,36 @@ import MDButton from "components/MDButton";
 import mqtt from "mqtt";
 import {host, options} from "../../config/mqtt.config";
 import MDTypography from "components/MDTypography";
+import {defined} from "chart.js/helpers";
+
 const controlTemperatura = () => {
 
     const [messages, setMessages] = useState({});
     const [count, setCount] = useState(4);
 
 
-    console.log(messages);
 
     async function getMessages() {
         try {
             const requestBodyTemperature = {
-                "topic": "microlab/agro/air/temperature"
+                "topic": "microlab/agro/green_house/temp_vent_ctrl"
             };
             const response = await axios.post('http://localhost:3001/api/messages/getByTopic', requestBodyTemperature);
             let result = response.data;
             console.log(result.length);
 
             let shortResult = result.splice(result.length - 50, result.length);
-
             setMessages({
                 labels: shortResult.map(x=> x.message_id),
                 datasets:
-                    { label: "Temperature",
-                        data: shortResult.map(x => JSON.parse(x.message).temperature),
+                    {
+                        label: "cur_temp",
+                        data: shortResult.map(x => JSON.parse(x.message).cur_temp),
                     }
             });
 
-            const resp = shortResult.map(x=> JSON.parse(x.message).temperature);
-            setCount(resp[49] + " °C");
+            const resp = shortResult.map(x=> JSON.parse(x.message).cur_temp);
+            setCount(resp[49] + "°C");
         } catch (error) {
             console.error(error);
         }
@@ -64,8 +65,8 @@ const controlTemperatura = () => {
 
     /*   Set Data */
     //const [settings, setSettings] = useState(null);
-    const [settingsTempTime, setSettingsTempTime] = useState(0);
-    const [setPoint, setPointSettings] = useState(0);
+    const [settingsTempTime, setSettingsTempTime] = useState(60);
+    const [setPoint, setPointSettings] = useState(20);
 
     function setMqttData() {
         try {
@@ -82,20 +83,13 @@ const controlTemperatura = () => {
     const changeTempSettingsHandler = (e) => {
         setSettingsTempTime(e.target.value);
         setPointSettings(e.target.value);
-
-
     };
-    // const changeHandler = (e) => {
-    //   setSettings(e.target.value);
-    // };
-
-
 
     /* MQTT */
     const [client, setClient] = useState(null);
     const [connectStatus, setConnectStatus] = useState(null);
 
-    const [temperature, setTemp] = useState(0);
+    const [cur_temp, setTemp] = useState(0);
 
     const tempTopic = 'microlab/agro/green_house/temp_vent_ctrl';
 
@@ -129,7 +123,7 @@ const controlTemperatura = () => {
                 setConnectStatus('Message received');
 
                 if (topic === tempTopic) {
-                    setTemp(JSON.parse(message.toString()).temperature);
+                    setTemp(JSON.parse(message.toString()).cur_temp);
                 }
                 console.log(message.toString());
             });
@@ -168,7 +162,7 @@ const controlTemperatura = () => {
         setIsManualExpanded(!isManualExpanded);
         try {
             const payload = {
-                cmd: "ctrl_out",
+                cmd: "ctrl_mod",
                 value: "0",
             };
 
@@ -196,7 +190,7 @@ const controlTemperatura = () => {
         try {
             const payload = {
                 cmd: "set_point",
-                value: parseFloat(setPoint),
+                value: String(parseFloat(setPoint)),
             };
 
             const topic = "microlab/agro/green_house/temp_vent_ctrl";
@@ -319,7 +313,7 @@ const controlTemperatura = () => {
                             <ComplexStatisticsCard
                                 icon="thermostat"
                                 title="Temperature"
-                                count={count}
+                                count={cur_temp}
                                 percentage={{
                                     color: "success",
                                     amount: "+1",
